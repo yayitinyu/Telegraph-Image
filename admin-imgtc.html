@@ -8,6 +8,13 @@
   <link rel="stylesheet" href="./admin-imgtc.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-ui@2.15.3/lib/theme-chalk/index.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap');
+
+    body {
+      font-family: "Google Sans Flex", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+  </style>
   <script src="https://js.sentry-cdn.com/219f636ac7bde5edab2c3e16885cb535.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -107,7 +114,16 @@
                 <div class="image-overlay">
                   <div class="overlay-buttons">
                     <el-button size="mini" type="info" @click.stop="handleEditName(item)">编辑</el-button>
-                    <el-button size="mini" type="primary" @click.stop="handleCopy(index, item.name)">复制</el-button>
+                    <el-dropdown split-button size="mini" type="primary" trigger="click"
+                      @click.native.stop="handleCopy(item.name)"
+                      @command="cmd => handleCopy(item.name, cmd)">
+                      复制
+                      <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item v-for="formatItem in copyFormats" :key="formatItem.command" :command="formatItem.command">
+                          {{ formatItem.label }}
+                        </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </el-dropdown>
                     <el-button size="mini" type="danger" @click.stop="handleDelete(index, item.name)">删除</el-button>
                   </div>
               </div>
@@ -151,7 +167,14 @@
                     <button class="control-btn like-btn" @click.stop="toggleLike(index, item.name)"><i :class="item.metadata.liked ? 'fas fa-heart liked' : 'far fa-heart'"></i></button>
                     <button class="control-btn edit-btn" @click.stop="handleEditName(item)"><i class="fas fa-edit"></i></button>
                     <button class="control-btn select-btn" @click.stop="toggleSelect(index, item.name)"><i :class="item.selected ? 'fas fa-square-check selected' : 'far fa-square'"></i></button>
-                    <button class="control-btn" @click.stop="handleCopy(index, item.name)"><i class="fas fa-link"></i></button>
+                    <el-dropdown trigger="click" @command="cmd => handleCopy(item.name, cmd)">
+                      <button class="control-btn" slot="reference" @click.stop="handleCopy(item.name)"><i class="fas fa-link"></i></button>
+                      <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item v-for="formatItem in copyFormats" :key="formatItem.command" :command="formatItem.command">
+                          {{ formatItem.label }}
+                        </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </el-dropdown>
                     <button class="control-btn" @click.stop="handleDelete(index, item.name)"><i class="fas fa-trash-alt"></i></button>
                   </div>
                 </div>
@@ -195,7 +218,14 @@
                     <button class="control-btn like-btn" @click.stop="toggleLike(index, item.name)"><i :class="item.metadata.liked ? 'fas fa-heart liked' : 'far fa-heart'"></i></button>
                     <button class="control-btn edit-btn" @click.stop="handleEditName(item)"><i class="fas fa-edit"></i></button>
                     <button class="control-btn select-btn" @click.stop="toggleSelect(index, item.name)"><i :class="item.selected ? 'fas fa-square-check selected' : 'far fa-square'"></i></button>
-                    <button class="control-btn" @click.stop="handleCopy(index, item.name)"><i class="fas fa-copy"></i></button>
+                    <el-dropdown trigger="click" @command="cmd => handleCopy(item.name, cmd)">
+                      <button class="control-btn" slot="reference" @click.stop="handleCopy(item.name)"><i class="fas fa-copy"></i></button>
+                      <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item v-for="formatItem in copyFormats" :key="formatItem.command" :command="formatItem.command">
+                          {{ formatItem.label }}
+                        </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </el-dropdown>
                     <button class="control-btn" @click.stop="handleDelete(index, item.name)"><i class="fas fa-trash-alt"></i></button>
                   </div>
                 </div>
@@ -232,7 +262,14 @@
                     <button class="control-btn like-btn" @click.stop="toggleLike(index, item.name)"><i :class="item.metadata.liked ? 'fas fa-heart liked' : 'far fa-heart'"></i></button>
                     <button class="control-btn edit-btn" @click.stop="handleEditName(item)"><i class="fas fa-edit"></i></button>
                     <button class="control-btn select-btn" @click.stop="toggleSelect(index, item.name)"><i :class="item.selected ? 'fas fa-square-check selected' : 'far fa-square'"></i></button>
-                    <button class="control-btn" @click.stop="handleCopy(index, item.name)"><i class="fas fa-copy"></i></button>
+                    <el-dropdown trigger="click" @command="cmd => handleCopy(item.name, cmd)">
+                      <button class="control-btn" slot="reference" @click.stop="handleCopy(item.name)"><i class="fas fa-copy"></i></button>
+                      <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item v-for="formatItem in copyFormats" :key="formatItem.command" :command="formatItem.command">
+                          {{ formatItem.label }}
+                        </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </el-dropdown>
                     <button class="control-btn" @click.stop="handleDelete(index, item.name)"><i class="fas fa-trash-alt"></i></button>
                   </div>
                 </div>
@@ -266,6 +303,12 @@
     el: '#app',
     data: {
       baseURL: document.location.origin,
+      copyFormats: [
+        { command: 'plain', label: '原链接' },
+        { command: 'markdown', label: 'Markdown' },
+        { command: 'html', label: 'HTML' },
+        { command: 'bbcode', label: 'BBCode' }
+      ],
       Number: 0,
       fileConfig: {
         image: {
@@ -607,11 +650,40 @@
         document.execCommand('copy');
         document.body.removeChild(textarea);
       },
-      handleCopy(index, key) {
+      copyText(text) {
+        if (navigator.clipboard?.writeText) {
+          return navigator.clipboard.writeText(text);
+        }
+        this.copyToClipboardFallback(text);
+        return Promise.resolve();
+      },
+      formatLink(link, format) {
+        switch (format) {
+          case 'markdown':
+            return `![img](${link})`;
+          case 'html':
+            return `<img src="${link}" />`;
+          case 'bbcode':
+            return `[img]${link}[/img]`;
+          default:
+            return link;
+        }
+      },
+      formatDisplayName(format) {
+        const mapper = {
+          plain: '原始链接',
+          markdown: 'Markdown 链接',
+          html: 'HTML 链接',
+          bbcode: 'BBCode 链接'
+        };
+        return mapper[format] || '链接';
+      },
+      handleCopy(key, format = 'plain') {
         const link = `${this.baseURL}/file/${key}`;
-        (navigator.clipboard?.writeText(link) || this.copyToClipboardFallback(link))
-          .then(() => this.$message.success('复制文件链接成功~'))
-          .catch(() => this.$message.error('自动复制失败，请手动复制链接：' + link));
+        const text = this.formatLink(link, format);
+        this.copyText(text)
+          .then(() => this.$message.success(`复制${this.formatDisplayName(format)}成功~`))
+          .catch(() => this.$message.error('自动复制失败，请手动复制链接：' + text));
       },
       // 批处理相关
       selectAllInPage() {  // 全选当前页

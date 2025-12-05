@@ -3,10 +3,87 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- import CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-ui@2.15.3/lib/theme-chalk/index.css"
     integrity="sha256-ghr1zmXTODLKl1HULQd6fq1MIe7m3FJiNTOCT8sddLM=" crossorigin="anonymous">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap');
+
+    :root {
+      --card-radius: 14px;
+      --surface: #ffffff;
+      --text: #2c3e50;
+      --muted: #9aa5b1;
+      --accent: #409eff;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #f5f7fb 0%, #eef2ff 100%);
+      font-family: "Google Sans Flex", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+    }
+
+    .dashboard-shell {
+      min-height: 100vh;
+    }
+
+    .dashboard-header {
+      background: var(--surface);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      border-bottom: 1px solid #eef1f5;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 8px 0;
+    }
+
+    .title-group h1 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .view-buttons a {
+      margin-left: 6px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .table-wrapper {
+      background: var(--surface);
+      border-radius: var(--card-radius);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.05);
+      padding: 14px;
+      overflow-x: auto;
+    }
+
     .el-image__inner.el-image__inner {
       width: 100%;
       height: 90px;
@@ -19,65 +96,78 @@
     .el-button+.el-button {
       margin: 0;
     }
+
+    .table-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .table-search {
+      max-width: 320px;
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .title-group h1 {
+        font-size: 22px;
+      }
+
+      .header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-actions {
+        width: 100%;
+      }
+
+      .table-actions {
+        justify-content: flex-start;
+      }
+    }
   </style>
   <script src="https://js.sentry-cdn.com/219f636ac7bde5edab2c3e16885cb535.min.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
   <div id="app">
-    <el-container>
-      <el-header>
-        <div style="
-         margin: auto;
-         line-height: 60px;
-         font-size: xx-large;
-         position: relative;
-     ">Dashboard
-
-
-          <span style="
-     position: absolute;
-     right: 0px;
-      ">
-            <a href="./admin-imgtc.html">
-              <el-button size="mini" type="warning">网格视图</el-button>
-            </a>
-            <a href="./admin-waterfall.html">
-              <el-button size="mini" type="primary">瀑布流</el-button>
-            </a>
-            <el-button v-if="showLogoutButton" size="mini" type="info" @click="handleLogout()">退出登录</el-button></span>
+    <el-container class="dashboard-shell">
+      <el-header class="dashboard-header">
+        <div class="header-bar">
+          <div class="title-group">
+            <h1>Dashboard</h1>
+            <div class="subtitle">便捷管理、筛选、复制链接</div>
+          </div>
+          <div class="header-actions">
+            <el-input v-model="search" @input="handleSearch" size="small" class="table-search"
+              prefix-icon="el-icon-search" placeholder="输入关键字搜索" />
+            <div class="view-buttons">
+              <a href="./admin-imgtc.html">
+                <el-button size="mini" type="warning">网格视图</el-button>
+              </a>
+              <a href="./admin-waterfall.html">
+                <el-button size="mini" type="primary">瀑布流</el-button>
+              </a>
+              <el-button v-if="showLogoutButton" size="mini" type="info" @click="handleLogout()">退出登录</el-button>
+            </div>
+          </div>
         </div>
       </el-header>
-      <el-main><el-row :gutter="12">
-          <el-col :span="24">
-            <el-card shadow="always">
-              记录总数量:
-              {{ Number }}
-            </el-card>
-          </el-col>
-          <!--<el-col :span="8">
-              <el-card shadow="hover">
-                <el-tooltip class="item" effect="dark" content="白名单数量" placement="top-start">
-                   
-                </el-tooltip>
-                白名单数量：{{ WhiteList }}
-              </el-card>
-            </el-col>
-            <el-col :span="8">
-              <el-card shadow="hover">
-                <el-tooltip class="item" effect="dark" content="黑名单数量" placement="top-start">
-                
-              </el-tooltip>
-              黑名单数量：{{ BlackList }}
-              </el-card>
-            </el-col>-->
-        </el-row>
-        <template>
+      <el-main>
+        <div class="stat-grid">
+          <el-card shadow="always">
+            <div style="font-size:14px;color:var(--muted);">记录总数量</div>
+            <div style="font-size:28px;font-weight:600;">{{ Number }}</div>
+          </el-card>
+        </div>
+        <div class="table-wrapper">
           <el-table :data="tableData.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
-            style="width: 100%">
-            <el-table-column label="name" prop="name">
+            style="width: 100%" border>
+            <el-table-column label="名称" prop="name" min-width="200">
             </el-table-column>
-            <el-table-column label="preview" prop="preview" align="center">
+            <el-table-column label="预览" prop="preview" align="center" min-width="220">
               <template slot-scope="scope">
                 <video v-if="scope.row.name.indexOf('.mp4')>0" style="width: 100%; height: 180px;" controls>
                   <source :src="'/file/'+scope.row.name" type="video/mp4">
@@ -87,7 +177,7 @@
 
               </template>
             </el-table-column>
-            <el-table-column label="data" prop="data">
+            <el-table-column label="元数据" prop="data" min-width="180">
               <template slot-scope="scope">
                 <el-popover trigger="hover" placement="top">
                   <p>{{ scope.row.metadata }}</p>
@@ -97,21 +187,29 @@
                 </el-popover>
               </template>
             </el-table-column>
-            <el-table-column align="right">
-              <template slot="header" slot-scope="scope">
-                <el-input v-model="search" @input="handleSearch" size="mini" placeholder="输入关键字搜索" />
-              </template>
+            <el-table-column align="right" min-width="260">
               <template slot-scope="scope">
-                <el-button size="mini" type="primary" @click="handleCopy(scope.$index,scope.row.name)">复制地址</el-button>
-                <el-button size="mini" type="primary" @click="handleWhite(scope.$index,scope.row.name)">白名单</el-button>
-                <el-button size="mini" type="info" @click="handleBlock(scope.$index,scope.row.name)">黑名单</el-button>
-                <el-button size="mini" type="danger" @click="handleDelete(scope.$index,scope.row.name)">删除</el-button>
+                <div class="table-actions">
+                  <el-dropdown split-button type="primary" size="mini" @click="handleCopy(scope.row.name)"
+                    @command="cmd => handleCopy(scope.row.name, cmd)">
+                    复制链接
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item command="plain">原链接</el-dropdown-item>
+                      <el-dropdown-item command="markdown">Markdown</el-dropdown-item>
+                      <el-dropdown-item command="html">HTML</el-dropdown-item>
+                      <el-dropdown-item command="bbcode">BBCode</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                  <el-button size="mini" type="primary" @click="handleWhite(scope.$index,scope.row.name)">白名单</el-button>
+                  <el-button size="mini" type="info" @click="handleBlock(scope.$index,scope.row.name)">黑名单</el-button>
+                  <el-button size="mini" type="danger" @click="handleDelete(scope.$index,scope.row.name)">删除</el-button>
+                </div>
               </template>
             </el-table-column>
-            </el-table>
-            <el-button v-if="nextCursor" style="margin-top:16px" @click="loadMore">加载更多</el-button>
-          </template>
-        </el-main>
+          </el-table>
+          <el-button v-if="nextCursor" style="margin-top:16px" @click="loadMore">加载更多</el-button>
+        </div>
+      </el-main>
     </el-container>
   </div>
 </body>
@@ -208,31 +306,61 @@
       handleLogout() {
         window.location.href = "./api/manage/logout";
       },
-      handleCopy(index, key) {
-        const text = `${document.location.origin}/file/${key}`;
-        if (navigator.clipboard) {
-          // clipboard api 复制
-          navigator.clipboard.writeText(text);
-        } else {
-          const textarea = document.createElement('textarea');
-          document.body.appendChild(textarea);
-          // 隐藏此输入框
-          textarea.style.position = 'fixed';
-          textarea.style.clip = 'rect(0 0 0 0)';
-          textarea.style.top = '10px';
-          // 赋值
-          textarea.value = text;
-          // 选中
-          textarea.select();
-          // 复制
-          document.execCommand('copy', true);
-          // 移除输入框
-          document.body.removeChild(textarea);
+      handleCopy(key, format = 'plain') {
+        const link = `${document.location.origin}/file/${key}`;
+        const text = this.formatLink(link, format);
+        this.copyText(text)
+          .then(() => {
+            this.$message({
+              message: `复制${this.formatDisplayName(format)}成功~`,
+              type: 'success'
+            });
+          })
+          .catch(() => {
+            this.$message({
+              message: '自动复制失败，请手动复制链接：' + text,
+              type: 'error'
+            });
+          });
+      },
+      copyText(text) {
+        if (navigator.clipboard?.writeText) {
+          return navigator.clipboard.writeText(text);
         }
-        this.$message({
-          message: '复制文件链接成功~',
-          type: 'success'
-        });
+        this.copyWithTextarea(text);
+        return Promise.resolve();
+      },
+      copyWithTextarea(text) {
+        const textarea = document.createElement('textarea');
+        document.body.appendChild(textarea);
+        textarea.style.position = 'fixed';
+        textarea.style.clip = 'rect(0 0 0 0)';
+        textarea.style.top = '10px';
+        textarea.value = text;
+        textarea.select();
+        document.execCommand('copy', true);
+        document.body.removeChild(textarea);
+      },
+      formatLink(link, format) {
+        switch (format) {
+          case 'markdown':
+            return `![img](${link})`;
+          case 'html':
+            return `<img src="${link}" />`;
+          case 'bbcode':
+            return `[img]${link}[/img]`;
+          default:
+            return link;
+        }
+      },
+      formatDisplayName(format) {
+        const mapper = {
+          plain: '原始链接',
+          markdown: 'Markdown 链接',
+          html: 'HTML 链接',
+          bbcode: 'BBCode 链接'
+        };
+        return mapper[format] || '链接';
       },
       handleSearch() {
         clearTimeout(this.searchTimer);
